@@ -7,18 +7,37 @@ import math._
   */
 object Simulation {
 
-  class Point(val x:Double, val y:Double)  {
+  class CoordinatePair(val x:Double, val y:Double)
+
+  class Point(override val x:Double, override val y:Double) extends CoordinatePair(x, y) {
+
     def distance(other:Point):Double = {
       sqrt(pow(x - other.x, 2)+pow(y - other.y, 2))
     }
-
-    lazy val magnitude:Double = sqrt(pow(x,2)+pow(y,2))
-    def normalized:Point = Point(x/magnitude, y/magnitude)
     override def toString: String = "Point(" + x + ", " + y + ")"
+
+    def vectorTo(other:Point):MathVector = MathVector(this, other)
   }
   object Point {
     def apply(x:Double, y:Double) = new Point(x, y)
   }
+
+
+  class MathVector(override val x:Double, override val y:Double) extends CoordinatePair(x, y) {
+
+    lazy val magnitude:Double = sqrt(pow(x,2)+pow(y,2))
+
+    def normalized:MathVector = MathVector(x/magnitude, y/magnitude)
+
+    override def toString: String = "Vector(" + x + ", " + y + ")"
+  }
+
+  object MathVector {
+    def apply(x:Double, y:Double) = new MathVector(x,y)
+
+    def apply(p1:Point, p2:Point) = new MathVector(p2.x - p1.x, p2.y - p1.y)
+  }
+
 
 
 
@@ -27,7 +46,7 @@ object Simulation {
   //case class Point(x:Int, y:Int)
   //case class DoublePoint(x:Double, y:Double)
 
-  val checkpoints = Vector(Point(500, 500))
+  val checkpoints = scala.Vector(Point(500, 500))
 
   var currentCheckpoint:Map[Player, Point] = Map.empty[Player, Point]
 
@@ -57,14 +76,34 @@ object Simulation {
     return ""
   }
 
+  def nextSpeed(position:Point, checkpoint:Point, currentSpeed:Vector, currentAngle:Int, thrust:Int):Vector = {
+
+    val checkpointVector = position.vectorTo(checkpoint)
+    val correctionAngle:Double = {
+      val angle = atan(checkpointVector.y/checkpointVector.x)*180/Pi
+      if (checkpointVector.x > 0)
+        angle
+      else if (checkpointVector.y > 0)
+        180 + angle
+      else
+        -180 + angle
+    }
+
+    return currentSpeed
+
+
+
+  }
+
 
 
   // get the next angle for a pod
-  def nextAngle(currentAngle: Int, position:Point, target:Point, checkpoint:Point):Int = {
+  def nextAngle(currentAngle: Int, position:Point, checkpoint:Point, target:Point ):Double = {
 
-    val checkpointVector = Point(checkpoint.x - position.x, checkpoint.y - position.y)
-    val targetVector = Point(target.x - position.x, target.y - position.y)
-    val checkpointTargetVector = Point(checkpoint.x - target.x, checkpoint.y - target.y)
+    val checkpointVector = MathVector(position, checkpoint)
+    val targetVector = MathVector(position, target)
+    val checkpointTargetVector = MathVector(checkpoint, target)
+
     
     val normalCheckpointVector = checkpointVector.normalized
     val normalTargetVector = targetVector.normalized
@@ -81,7 +120,7 @@ object Simulation {
         -180 - crossProdAngle
     }
 
-    currentAngle + max(min(targetAngle - currentAngle, 18),-18).toInt // angle is truncated in the game
+    currentAngle + max(min(targetAngle - currentAngle, 18),-18)
   }
 
 }
