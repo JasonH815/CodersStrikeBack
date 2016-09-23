@@ -8,7 +8,7 @@ import scala.util._
   * It uses the standard input to place data into the game variables such as x and y.
   * YOU DO NOT NEED TO MODIFY THE INITIALIZATION OF THE GAME VARIABLES.
   **/
-object Player extends App {
+object PlayerOld extends App {
 
 
   var playerParams = new PlayerParams()
