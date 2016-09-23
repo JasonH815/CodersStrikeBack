@@ -8,7 +8,7 @@ import scala.util._
   * It uses the standard input to place data into the game variables such as x and y.
   * YOU DO NOT NEED TO MODIFY THE INITIALIZATION OF THE GAME VARIABLES.
   **/
-object PlayerV2 extends App {
+object Player extends App {
 
 
   var playerParams = new PlayerParams()
@@ -235,14 +235,15 @@ object PlayerV2 extends App {
     opponentParams = opponentParams.updated(opponentLine)
 
     if (turn < 10) {
-      println(playerParams.position.x + " 0 0")
+      println((playerParams.checkPoint.x - 2 * playerParams.position.x) + " " + (playerParams.checkPoint.y - 2 * playerParams.position.y)   + " 0")
     }
 
-    else if (turn < 35)
-      println(playerParams.position.x + " 0 100")
-
-    else
-      println("0 " + playerParams.position.y + " 0")
+    //else if (turn < 35)
+     // println(playerParams.position.x + " 0 100")
+//
+    //else
+    //  println("0 " + playerParams.position.y + " 0")
+    else println("0 0 100")
 
 
     turn += 1
