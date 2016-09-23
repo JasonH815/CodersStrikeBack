@@ -76,7 +76,9 @@ object Simulation {
     return ""
   }
 
-  def nextSpeed(position:Point, checkpoint:Point, currentSpeed:Vector, currentAngle:Int, thrust:Int):Vector = {
+
+
+  def nextVelocity(position:Point, checkpoint:Point, currentVelocity:MathVector, nextAngle:Double, thrust:Int):MathVector = {
 
     val checkpointVector = position.vectorTo(checkpoint)
     val correctionAngle:Double = {
@@ -89,10 +91,17 @@ object Simulation {
         -180 + angle
     }
 
-    return currentSpeed
+
+    val normalizedAngle = correctionAngle - nextAngle
+
+    //debug
+    Console.err.println("Checkpoint vector: " + checkpointVector)
+    Console.err.println("Correction angle: " + correctionAngle)
+    Console.err.println("Next angle: " + nextAngle)
+    Console.err.println("Normalized Angle: " + normalizedAngle)
 
 
-
+    MathVector((currentVelocity.x + thrust *cos(normalizedAngle*Pi/180))*.85, (currentVelocity.y + thrust*sin(normalizedAngle*Pi/180))*.85)
   }
 
 
@@ -119,6 +128,14 @@ object Simulation {
       else
         -180 - crossProdAngle
     }
+
+    //debug
+    Console.err.println("Checkpoint unit vector: " + normalCheckpointVector)
+    Console.err.println("Target unit vector: " + normalTargetVector)
+    Console.err.println("Cross product: " + crossProduct)
+    Console.err.println("Angle needed to complete turn: " + targetAngle)
+    Console.err.println("pos-checkpoint magnitude: " + checkpointVector.magnitude)
+    Console.err.println("target-checkpoint magnitude: " + checkpointTargetVector.magnitude)
 
     currentAngle + max(min(targetAngle - currentAngle, 18),-18)
   }
