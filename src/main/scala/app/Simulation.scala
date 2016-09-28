@@ -117,17 +117,26 @@ object Simulation {
     val normalCheckpointVector = checkpointVector.normalized
     val normalTargetVector = targetVector.normalized
 
+    val dotProduct = normalCheckpointVector.x * normalTargetVector.x + normalCheckpointVector.y * normalTargetVector.y
     val crossProduct = normalCheckpointVector.y * normalTargetVector.x - normalCheckpointVector.x * normalTargetVector.y
-    val targetAngle = {
-      val crossProdAngle = asin(crossProduct)*180/Pi
-      // if checkpoint-target vector is longer than position-checkpoint vector, the triangle formed is oblique
-      if (normalCheckpointVector.magnitude > checkpointTargetVector.magnitude)
-        crossProdAngle
-      else if (crossProdAngle > 0)  //true angle is > 90, so use form of 180-angle to get complement
-        180 - crossProdAngle
-      else
-        -180 - crossProdAngle
-    }
+
+
+    val angleMagnitude = acos(dotProduct)*180/Pi
+    val angleDirection = asin(crossProduct)*180/Pi
+
+    val targetAngle = if (angleDirection > 0) angleMagnitude else angleMagnitude * -1
+
+
+//    val targetAngle = {
+//      val crossProdAngle = asin(crossProduct)*180/Pi
+//      // if checkpoint-target vector is longer than position-checkpoint vector, the triangle formed is oblique
+//      if (normalCheckpointVector.magnitude > checkpointTargetVector.magnitude)
+//        crossProdAngle
+//      else if (crossProdAngle > 0)  //true angle is > 90, so use form of 180-angle to get complement
+//        180 - crossProdAngle
+//      else
+//        -180 - crossProdAngle
+//    }
 
     //debug
     Console.err.println("Checkpoint unit vector: " + normalCheckpointVector)
