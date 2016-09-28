@@ -1,13 +1,14 @@
 import math._
 import app.Simulation._
 
+val position = Point(2771, 2853)
+val checkPoint = Point(11485, 6086)
+val target = Point(2771, 8000)
 
-val checkPoint = Point(11222, 5407)
-val position = Point(7718, 2198)
-val target = Point(11222, 5407)
-
-val a = nextAngle(35, position, checkPoint, target)
-val s = nextVelocity(position, checkPoint, MathVector(0,0), a, 100)
+val a = nextAngle(-69, position, checkPoint, target)
+val s = calculateVelocity(position, checkPoint, MathVector(17,154), a, 100)
+val ns = nextVelocity(s)
+val p = nextPosition(position, s)
 
 
 

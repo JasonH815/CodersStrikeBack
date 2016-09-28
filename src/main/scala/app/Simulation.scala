@@ -78,7 +78,7 @@ object Simulation {
 
 
 
-  def nextVelocity(position:Point, checkpoint:Point, currentVelocity:MathVector, nextAngle:Double, thrust:Int):MathVector = {
+  def calculateVelocity(position:Point, checkpoint:Point, currentVelocity:MathVector, angle:Double, thrust:Int):MathVector = {
 
     val checkpointVector = position.vectorTo(checkpoint)
     val correctionAngle:Double = {
@@ -91,17 +91,26 @@ object Simulation {
         -180 + angle
     }
 
-
-    val normalizedAngle = correctionAngle - nextAngle
+    val correctedAngle = correctionAngle - angle
 
     //debug
     Console.err.println("Checkpoint vector: " + checkpointVector)
     Console.err.println("Correction angle: " + correctionAngle)
-    Console.err.println("Next angle: " + nextAngle)
-    Console.err.println("Normalized Angle: " + normalizedAngle)
+    Console.err.println("angle: " + angle)
+    Console.err.println("Corrected Angle: " + correctedAngle)
 
 
-    MathVector((currentVelocity.x + thrust *cos(normalizedAngle*Pi/180))*.85, (currentVelocity.y + thrust*sin(normalizedAngle*Pi/180))*.85)
+    MathVector(currentVelocity.x + thrust *cos(correctedAngle*Pi/180), currentVelocity.y + thrust*sin(correctedAngle*Pi/180))
+  }
+
+  def nextVelocity(velocity:MathVector):MathVector = {
+    MathVector(velocity.x*.85, velocity.y*.85)
+  }
+
+  def nextPosition(position:Point, velocity:MathVector):Point = {
+    val nextX = position.x + velocity.x
+    val nextY = position.y + velocity.y
+    Point(nextX, nextY)
   }
 
 
@@ -112,7 +121,6 @@ object Simulation {
     val checkpointVector = MathVector(position, checkpoint)
     val targetVector = MathVector(position, target)
     val checkpointTargetVector = MathVector(checkpoint, target)
-
     
     val normalCheckpointVector = checkpointVector.normalized
     val normalTargetVector = targetVector.normalized
@@ -120,27 +128,15 @@ object Simulation {
     val dotProduct = normalCheckpointVector.x * normalTargetVector.x + normalCheckpointVector.y * normalTargetVector.y
     val crossProduct = normalCheckpointVector.y * normalTargetVector.x - normalCheckpointVector.x * normalTargetVector.y
 
-
     val angleMagnitude = acos(dotProduct)*180/Pi
     val angleDirection = asin(crossProduct)*180/Pi
 
     val targetAngle = if (angleDirection > 0) angleMagnitude else angleMagnitude * -1
 
-
-//    val targetAngle = {
-//      val crossProdAngle = asin(crossProduct)*180/Pi
-//      // if checkpoint-target vector is longer than position-checkpoint vector, the triangle formed is oblique
-//      if (normalCheckpointVector.magnitude > checkpointTargetVector.magnitude)
-//        crossProdAngle
-//      else if (crossProdAngle > 0)  //true angle is > 90, so use form of 180-angle to get complement
-//        180 - crossProdAngle
-//      else
-//        -180 - crossProdAngle
-//    }
-
     //debug
     Console.err.println("Checkpoint unit vector: " + normalCheckpointVector)
     Console.err.println("Target unit vector: " + normalTargetVector)
+    Console.err.println("Dot product: " + dotProduct)
     Console.err.println("Cross product: " + crossProduct)
     Console.err.println("Angle needed to complete turn: " + targetAngle)
     Console.err.println("pos-checkpoint magnitude: " + checkpointVector.magnitude)
